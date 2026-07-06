@@ -1,0 +1,23 @@
+{
+  "users": {
+    "google_varunsharmagooglecom": {
+      "username": "Varun Sharma",
+      "email": "varun.sharma@google.com",
+      "provider": "google",
+      "funds": 45229.76684541851,
+      "activeHoldings": [],
+      "closedHoldings": [
+        {
+          "symbol": "AAPL",
+          "type": "buy",
+          "entryPrice": 171.56,
+          "exitPrice": 171.52,
+          "invested": 1000,
+          "withdrawn": 999.7668454185125,
+          "pnl": -0.23315458148749713,
+          "time": "11:29:51 pm"
+        }
+      ]
+    }
+  }
+}

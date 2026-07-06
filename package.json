@@ -1,0 +1,26 @@
+{
+  "name": "stocksense-ai-dashboard",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "echo \"No tests configured\""
+  },
+  "keywords": [
+    "stocksense",
+    "finance",
+    "dashboard",
+    "express"
+  ],
+  "author": "",
+  "license": "ISC",
+  "description": "A glassmorphism stock forecasting dashboard with authentication and portfolio features.",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "body-parser": "^2.3.0",
+    "dotenv": "^16.4.0",
+    "express": "^5.2.1",
+    "express-session": "^1.19.0"
+  }
+}

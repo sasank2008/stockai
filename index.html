@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StockSense AI - Advanced Stock Forecasting Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <!-- Ambient Glowing Background Elements -->
+    <div class="bg-glow-sphere sphere-1"></div>
+    <div class="bg-glow-sphere sphere-2"></div>
+
+    <!-- Login / Sign Up Glassmorphic Panel -->
+    <div id="auth-view" style="display: flex; min-height: 100vh; align-items: center; justify-content: center; padding: 2rem; position: relative; z-index: 10;">
+        <div class="glass-card" style="width: 100%; max-width: 440px; padding: 2.5rem; display: flex; flex-direction: column; gap: 1.5rem; position: relative;">
+            <div class="alert-modal-glow" style="background: radial-gradient(circle, rgba(95, 90, 246, 0.25) 0%, transparent 65%);"></div>
+            
+            <div style="text-align: center;">
+                <div class="brand-logo" style="margin: 0 auto 1rem; width: 48px; height: 48px;">
+                    <svg viewBox="0 0 24 24" width="28" height="28">
+                        <path d="M22 12h-4l-3 9L9 3l-3 9H2" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke="white" stroke-width="2.5"/>
+                    </svg>
+                </div>
+                <h1 style="font-size: 1.7rem; font-weight: 850; color: white; margin-bottom: 0.25rem;">StockSense AI</h1>
+                <p style="font-size: 0.82rem; color: var(--text-secondary);">Empowering intelligence in predictive assets trading.</p>
+            </div>
+
+            <!-- Login / Signup switch tabs -->
+            <div style="display: flex; gap: 0.5rem; background: rgba(255,255,255,0.03); border: 1px solid var(--border-card); padding: 0.25rem; border-radius: var(--radius-md);">
+                <button class="order-tab-btn active" id="auth-tab-login" onclick="switchAuthTab('login')" style="flex: 1; padding: 0.5rem 0;">Sign In</button>
+                <button class="order-tab-btn" id="auth-tab-signup" onclick="switchAuthTab('signup')" style="flex: 1; padding: 0.5rem 0;">Create Account</button>
+            </div>
+
+            <!-- Validation Error Alert Row -->
+            <div id="auth-error-box" style="display: none; padding: 0.65rem 0.85rem; background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239,68,68,0.25); border-radius: var(--radius-sm); color: var(--danger); font-size: 0.78rem; text-align: center; font-weight: 600;">
+                Invalid credentials. Please try again.
+            </div>
+
+            <!-- Form Body -->
+            <form id="auth-form" onsubmit="handleAuthSubmit(event)" style="display: flex; flex-direction: column; gap: 1rem;">
+                <div style="display: flex; flex-direction: column; gap: 0.4rem;">
+                    <label for="auth-username" style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Username</label>
+                    <input type="text" id="auth-username" required placeholder="Enter username" style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-card); padding: 0.65rem 1rem; border-radius: var(--radius-sm); color: white; outline: none; font-size: 0.85rem; font-family: 'Inter', sans-serif; transition: var(--transition);" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border-card)'">
+                </div>
+                
+                <div style="display: flex; flex-direction: column; gap: 0.4rem;">
+                    <label for="auth-password" style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Password</label>
+                    <input type="password" id="auth-password" required placeholder="••••••••" style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-card); padding: 0.65rem 1rem; border-radius: var(--radius-sm); color: white; outline: none; font-size: 0.85rem; font-family: 'Inter', sans-serif; transition: var(--transition);" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border-card)'">
+                </div>
+
+                <button class="order-btn-submit" type="submit" id="auth-submit-btn" style="margin-top: 0.5rem; padding: 0.75rem 0; width: 100%;">
+                    Unlock Dashboard
+                </button>
+            </form>
+
+            <div style="display: flex; align-items: center; gap: 0.75rem; color: var(--text-muted); font-size: 0.75rem; justify-content: center; margin: 0.25rem 0;">
+                <div style="height: 1px; background: rgba(255,255,255,0.08); flex: 1;"></div>
+                <span>OR AUTHENTICATE WITH</span>
+                <div style="height: 1px; background: rgba(255,255,255,0.08); flex: 1;"></div>
+            </div>
+
+            <!-- Social OAuth Buttons Row -->
+            <div style="display: flex; flex-direction: column; gap: 0.65rem;">
+                <!-- Google Button -->
+                <button class="action-btn" onclick="triggerSocialAuth('google')" style="background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.08); color: white; display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.65rem 0; font-size: 0.82rem; width: 100%; transition: var(--transition);" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='rgba(255,255,255,0.04)'">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="color: #ea4335;">
+                        <path d="M12.24 10.285V14.4h6.887c-.648 2.41-2.519 4.114-5.136 4.114-3.44 0-6.228-2.788-6.228-6.228 0-3.44 2.788-6.228 6.228-6.228 1.54 0 2.943.557 4.037 1.548l3.113-3.113C19.218 2.683 16.03 1 12.24 1 5.756 1 .5 6.256.5 12.74s5.256 11.74 11.74 11.74c7.322 0 11.74-5.16 11.74-11.74 0-.79-.07-1.54-.2-2.285H12.24z"/>
+                    </svg>
+                    Google Account
+                </button>
+                
+                <!-- Facebook Button -->
+                <button class="action-btn" onclick="triggerSocialAuth('facebook')" style="background: rgba(59, 89, 152, 0.15); border-color: rgba(59, 89, 152, 0.35); color: #8b9dc3; display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.65rem 0; font-size: 0.82rem; width: 100%; transition: var(--transition);" onmouseover="this.style.background='rgba(59, 89, 152, 0.25)'" onmouseout="this.style.background='rgba(59, 89, 152, 0.15)'">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="color: #3b5998;">
+                        <path d="M9 8H7v3h2v9h3v-9h3.625L16 8h-4V6.438c0-.663.181-.884.778-.884H15V2h-2.542C10.024 2 9 3.418 9 5.375V8z"/>
+                    </svg>
+                    Facebook Gateway
+                </button>
+
+                <!-- GitHub Button -->
+                <button class="action-btn" onclick="triggerSocialAuth('github')" style="background: rgba(36, 41, 46, 0.3); border-color: rgba(255, 255, 255, 0.15); color: #c9d1d9; display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.65rem 0; font-size: 0.82rem; width: 100%; transition: var(--transition);" onmouseover="this.style.background='rgba(36, 41, 46, 0.5)'" onmouseout="this.style.background='rgba(36, 41, 46, 0.3)'">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="color: white;">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.167 6.839 9.49.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.579.688.481C19.137 20.164 22 16.418 22 12c0-5.523-4.477-10-10-10z"/>
+                    </svg>
+                    GitHub Repository
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-container" style="display: none;">
+        
+        <!-- Dashboard Main Page View -->
+        <div id="dashboard-view" class="view-panel">
+            <!-- Header Section -->
+            <header>
+            <div class="brand-section">
+                <div class="brand-logo">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M22 12h-4l-3 9L9 3l-3 9H2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="brand-name">StockSense AI</h1>
+                </div>
+            </div>
+
+            <!-- Horizontal Ticker scroll -->
+            <div class="ticker-wrap">
+                <div class="ticker" id="header-ticker">
+                    <!-- Dynamically loaded -->
+                </div>
+            </div>
+
+            <div class="header-actions">
+                <div class="time-badge" id="current-time-badge">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    <span id="date-string">July 6, 2026 21:28:01</span>
+                </div>
+
+                <!-- Investment PnL Stats Badge Button -->
+                <div class="header-portfolio-btn" id="stats-trigger" onclick="navigateToPage('portfolio')" style="cursor: pointer;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                        <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+                    </svg>
+                    <span>Total Invested:</span>
+                    <strong id="header-total-invested-label" style="color: white;">$0.00</strong>
+                </div>
+                
+                <!-- Alert Bell -->
+                <div class="alert-bell-container" id="alert-bell-trigger">
+                    <div class="alert-bell">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                        </svg>
+                    </div>
+                    <span class="bell-badge" id="bell-badge"></span>
+                </div>
+
+                <!-- Google Style Account Avatar Trigger -->
+                <div class="google-profile-container" id="profile-trigger">
+                    <button class="google-avatar-btn" aria-label="Account details">
+                        <span>VS</span>
+                    </button>
+                    
+                    <!-- Google Style Account Dropdown Card -->
+                    <div class="google-account-card" id="profile-menu">
+                        <div class="card-header">
+                            <span class="card-email">varun.sharma@stocksense.ai</span>
+                            <button class="card-close-btn" id="profile-close-btn">&times;</button>
+                        </div>
+                        
+                        <div class="card-body">
+                            <div class="large-avatar">
+                                <span>VS</span>
+                                <div class="avatar-hover-overlay">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+                                        <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+                                    </svg>
+                                </div>
+                            </div>
+                            <h3 class="user-fullname">Varun Sharma</h3>
+                            <span class="manage-account-btn">Manage your StockSense Account</span>
+                        </div>
+                        
+                        <!-- Account Details / Portfolio Segment -->
+                        <div class="portfolio-segment">
+                            <div class="segment-title">Trading Portfolio Summary</div>
+                            <div class="segment-row">
+                                <span>Client ID:</span>
+                                <strong>VS8892</strong>
+                            </div>
+                            <div class="segment-row">
+                                <span>Available Funds:</span>
+                                <strong id="profile-funds" style="color: var(--secondary);">$45,230.00</strong>
+                            </div>
+                            <div class="segment-row" style="cursor: pointer; transition: 0.2s;" onclick="navigateToPage('portfolio')" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+                                <span>Total Invested in Stocks:</span>
+                                <strong id="profile-total-invested" style="color: #22d3ee; display: flex; align-items: center; gap: 4px;">
+                                    $0.00
+                                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+                                </strong>
+                            </div>
+                            <div class="segment-row">
+                                <span>Account Status:</span>
+                                <span class="badge-active">ACTIVE</span>
+                            </div>
+                        </div>
+                        
+                        <div class="card-footer">
+                            <button class="sign-out-btn" onclick="logoutUser()">
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="margin-right: 4px; vertical-align: middle;">
+                                    <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
+                                </svg>
+                                Sign out
+                            </button>
+                            <div class="footer-links">
+                                <a href="#">Privacy Policy</a>
+                                <span>•</span>
+                                <a href="#">Terms of Service</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Search / Control Bar -->
+        <div class="control-bar">
+            <div class="stock-selector" id="stock-selectors">
+                <!-- Loaded dynamically -->
+            </div>
+            <div class="time-badge">
+                <span style="color: var(--secondary); font-weight: bold; font-family: monospace;">● Live Feed Connected</span>
+            </div>
+        </div>
+
+        <!-- Dashboard Grid Layout -->
+        <div class="dashboard-grid">
+            
+            <!-- Left Column: Main Charts, Metrics, and Recommendations List -->
+            <main class="main-content">
+                
+                <!-- Summary Metrics Row -->
+                <div class="metrics-row">
+                    <!-- Yesterday's Closing -->
+                    <div class="glass-card metric-card yesterday">
+                        <span class="metric-title">Yesterday's Close</span>
+                        <span class="metric-value" id="metric-yesterday">--</span>
+                        <div class="metric-diff neutral">
+                            <span>Historical Close</span>
+                        </div>
+                    </div>
+
+                    <!-- Today's Price (Realtime) -->
+                    <div class="glass-card metric-card today">
+                        <span class="metric-title">Today's Price</span>
+                        <span class="metric-value" id="metric-today">--</span>
+                        <div class="metric-diff" id="metric-today-diff">
+                            <span class="diff-arrow"></span> <span class="diff-val">--</span>
+                        </div>
+                    </div>
+
+                    <!-- Tomorrow's Prediction -->
+                    <div class="glass-card metric-card tomorrow" id="metric-tomorrow-card">
+                        <span class="metric-title">AI Tomorrow Prediction</span>
+                        <span class="metric-value" id="metric-tomorrow">--</span>
+                        <div class="metric-diff" id="metric-tomorrow-diff">
+                            <span class="diff-arrow"></span> <span class="diff-val">--</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Chart Card -->
+                <div class="glass-card chart-card">
+                    <div class="chart-header">
+                        <div>
+                            <h2 style="font-size: 1.25rem; display: flex; align-items: center; gap: 0.5rem;" id="chart-stock-title">
+                                AAPL Trend Dashboard
+                            </h2>
+                            <span style="font-size: 11px; font-weight: 500; color: var(--secondary); border: 1px solid rgba(16,185,129,0.3); padding: 2px 6px; border-radius: 3px; background: rgba(16,185,129,0.05); margin-top: 4px; display: inline-block;" id="chart-accuracy-badge">Yesterday's Accuracy: --</span>
+                        </div>
+                        <div class="chart-legend">
+                            <div class="legend-item">
+                                <span class="legend-color legend-yesterday"></span>
+                                <span>Yesterday Actual</span>
+                            </div>
+                            <div class="legend-item">
+                                <span style="display:inline-block; width:14px; height:1px; border-bottom: 2px dashed #ec4899;"></span>
+                                <span>Yesterday Predicted</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color legend-today"></span>
+                                <span>Today Live</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color legend-tomorrow"></span>
+                                <span>Tomorrow Prediction</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="stockChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Quick Trade Action Button Row directly under chart -->
+                <div class="quick-trade-row">
+                    <button class="quick-trade-btn quick-buy" id="chart-buy-btn" onclick="triggerQuickTrade('buy')">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                            <path d="M12 5v14M5 12h14"/>
+                        </svg>
+                        BUY <span id="quick-buy-ticker">AAPL</span>
+                    </button>
+                    <button class="quick-trade-btn quick-sell" id="chart-sell-btn" onclick="triggerQuickTrade('sell')">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                            <path d="M5 12h14"/>
+                        </svg>
+                        SELL <span id="quick-sell-ticker">AAPL</span>
+                    </button>
+                </div>
+
+                <!-- Active Holdings Portfolio Card -->
+                <div class="glass-card" style="margin-top: 1.5rem;" id="portfolio-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.2rem; border-bottom: 1px solid var(--border-card); padding-bottom: 0.75rem;">
+                        <h2 style="font-size: 1.25rem; color: white; display: flex; align-items: center; gap: 0.5rem; margin: 0;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5">
+                                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+                            </svg>
+                            Your Active Holdings & Portfolio Positions
+                        </h2>
+                        
+                        <!-- Withdraw All Button -->
+                        <button class="withdraw-all-btn" id="withdraw-all-btn" onclick="withdrawAllPositions()" disabled>
+                            Withdraw All (Liquidate)
+                        </button>
+                    </div>
+
+                    <!-- Portfolio Metrics Banner -->
+                    <div class="portfolio-metrics-banner" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.2rem; background: rgba(255,255,255,0.02); border: 1px solid var(--border-card); padding: 1rem; border-radius: var(--radius-md);">
+                        <div style="display: flex; flex-direction: column;">
+                            <span style="font-size: 0.75rem; color: var(--text-secondary);">Total Funds Invested</span>
+                            <strong style="font-size: 1.3rem; color: white;" id="port-total-invested">$0.00</strong>
+                        </div>
+                        <div style="display: flex; flex-direction: column;">
+                            <span style="font-size: 0.75rem; color: var(--text-secondary);">Current Value (Est)</span>
+                            <strong style="font-size: 1.3rem; color: white;" id="port-current-value">$0.00</strong>
+                        </div>
+                        <div style="display: flex; flex-direction: column;">
+                            <span style="font-size: 0.75rem; color: var(--text-secondary);">Unrealized Profit/Loss</span>
+                            <strong style="font-size: 1.3rem; color: var(--text-secondary);" id="port-unrealized-pnl">$0.00 (0.00%)</strong>
+                        </div>
+                    </div>
+
+                    <!-- Positions Table -->
+                    <div style="overflow-x: auto; max-height: 250px;">
+                        <table class="recommendations-table" style="width: 100%; border-collapse: collapse; text-align: left;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid var(--border-card); color: var(--text-secondary); font-size: 0.75rem;">
+                                    <th style="padding: 0.5rem 1rem;">Position</th>
+                                    <th style="padding: 0.5rem 1rem;">Allocated Capital</th>
+                                    <th style="padding: 0.5rem 1rem;">Entry Price</th>
+                                    <th style="padding: 0.5rem 1rem;">Live Price</th>
+                                    <th style="padding: 0.5rem 1rem;">Current Value</th>
+                                    <th style="padding: 0.5rem 1rem;">Profit / Loss</th>
+                                    <th style="padding: 0.5rem 1rem; text-align: right;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="portfolio-positions-body">
+                                <tr>
+                                    <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 1.5rem 0; font-size: 0.85rem;">
+                                        No active holdings. Set amount on ROI card and click "Place Order" to invest!
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- AI Recommendations List Card (Stack-Wise) -->
+                <div class="glass-card" style="margin-top: 1.5rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.2rem;">
+                        <h2 style="font-size: 1.25rem; color: white; display: flex; align-items: center; gap: 0.5rem; margin: 0;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2">
+                                <path d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-8.06 3.42 3.42 0 013.438 0 3.42 3.42 0 001.946 8.06 3.42 3.42 0 011.946 8.06 3.42 3.42 0 00-1.946 8.06 3.42 3.42 0 01-3.438 0 3.42 3.42 0 00-1.946-8.06 3.42 3.42 0 01-1.946-8.06 3.42 3.42 0 001.946-8.06z"/>
+                            </svg>
+                            AI Market Recommendations
+                        </h2>
+                        <div class="stack-tabs" style="display: flex; gap: 0.3rem; background: rgba(255,255,255,0.03); border: 1px solid var(--border-card); padding: 0.25rem; border-radius: var(--radius-md);">
+                            <button class="stack-tab-btn active" id="tab-tech" onclick="switchStack('tech')">💻 Tech & AI</button>
+                            <button class="stack-tab-btn" id="tab-ev" onclick="switchStack('ev')">⚡ EV & Mobility</button>
+                            <button class="stack-tab-btn" id="tab-crypto" onclick="switchStack('crypto')">🪙 Crypto & Web3</button>
+                        </div>
+                    </div>
+                    <div style="overflow-x: auto;">
+                        <table class="recommendations-table" style="width: 100%; border-collapse: collapse; text-align: left;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid var(--border-card); color: var(--text-secondary); font-size: 0.75rem;">
+                                    <th style="padding: 0.75rem 1rem;">Asset / Ticker</th>
+                                    <th style="padding: 0.75rem 1rem;">Live Price</th>
+                                    <th style="padding: 0.75rem 1rem;">Tomorrow Forecast</th>
+                                    <th style="padding: 0.75rem 1rem;">Expected AI ROI</th>
+                                    <th style="padding: 0.75rem 1rem;">Growth Probability</th>
+                                    <th style="padding: 0.75rem 1rem; text-align: center;">AI Signal</th>
+                                    <th style="padding: 0.75rem 1rem; text-align: right;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recommendations-table-body">
+                                <!-- Loaded dynamically via app.js -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Verified Customer Purchases & Accuracy Ledger Card -->
+                <div class="glass-card" style="margin-top: 1.5rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.2rem; border-bottom: 1px solid var(--border-card); padding-bottom: 0.75rem;">
+                        <h2 style="font-size: 1.25rem; color: white; display: flex; align-items: center; gap: 0.5rem; margin: 0;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--secondary)" stroke-width="2.5">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                            </svg>
+                            Verified Customer Purchases & Accuracy Ledger
+                        </h2>
+                        <!-- Summary metrics inside card -->
+                        <div style="display: flex; gap: 1rem; font-size: 0.8rem;">
+                            <div style="background: rgba(16,185,129,0.05); border: 1px solid rgba(16,185,129,0.2); padding: 2px 8px; border-radius: 4px;">
+                                <span style="color: var(--text-secondary);">Avg Accuracy:</span> <strong style="color: var(--secondary);">99.70%</strong>
+                            </div>
+                            <div style="background: rgba(95,90,246,0.05); border: 1px solid rgba(95,90,246,0.2); padding: 2px 8px; border-radius: 4px;">
+                                <span style="color: var(--text-secondary);">Avg ROI:</span> <strong style="color: var(--primary);">+2.83%</strong>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 1rem; margin-top: -8px;">
+                        Historically verified purchases executed by various global customer accounts showing the predictive accuracy of the StockSense AI models.
+                    </p>
+                    
+                    <div style="overflow-x: auto;">
+                        <table class="recommendations-table" style="width: 100%; border-collapse: collapse; text-align: left;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid var(--border-card); color: var(--text-secondary); font-size: 0.75rem;">
+                                    <th style="padding: 0.75rem 1rem;">Investor Account</th>
+                                    <th style="padding: 0.75rem 1rem;">Asset / Ticker</th>
+                                    <th style="padding: 0.75rem 1rem;">Purchase Price</th>
+                                    <th style="padding: 0.75rem 1rem;">AI Target Forecast</th>
+                                    <th style="padding: 0.75rem 1rem;">Actual Price Met</th>
+                                    <th style="padding: 0.75rem 1rem; text-align: center;">Verified Accuracy</th>
+                                    <th style="padding: 0.75rem 1rem; text-align: right;">Verified Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="trust-ledger-body">
+                                <!-- Populated dynamically by app.js -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+
+            <!-- Right Column: AI Insights, Interactive Order Ticket, Drop Alerts -->
+            <aside class="sidebar-panel">
+                
+                <!-- Note: AI Insights moved inside the Portfolio Analytics Drawer -->
+
+                <!-- ROI Investment Calculator & BUY / SELL Order Placement -->
+                <div class="glass-card calculator-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-card); padding-bottom: 0.75rem; margin-bottom: 0.5rem;">
+                        <h3 style="font-size: 1.15rem; color: white;">Order Ticket & ROI</h3>
+                        <div style="display: flex; gap: 0.3rem; background: rgba(255,255,255,0.03); border: 1px solid var(--border-card); padding: 0.2rem; border-radius: var(--radius-sm);">
+                            <button class="order-tab-btn active" id="order-btn-buy" onclick="setOrderType('buy')">BUY</button>
+                            <button class="order-tab-btn" id="order-btn-sell" onclick="setOrderType('sell')">SELL</button>
+                        </div>
+                    </div>
+                    <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: -4px;">Select Buy/Sell. Slide amount to allocate margin and execute trades.</p>
+
+                    <!-- Investment size slider -->
+                    <div class="input-group">
+                        <div class="slider-label">
+                            <span>Amount to Invest</span>
+                            <span class="slider-value" id="calc-amount-label">$1,000</span>
+                        </div>
+                        <input type="range" id="calc-amount" min="100" max="50000" step="100" value="1000">
+                    </div>
+
+                    <!-- Hold Period slider -->
+                    <div class="input-group">
+                        <div class="slider-label">
+                            <span>Prediction Leverage Time</span>
+                            <span class="slider-value" id="calc-days-label">1 Day</span>
+                        </div>
+                        <input type="range" id="calc-days" min="1" max="7" step="1" value="1" disabled style="opacity: 0.5;">
+                        <span style="font-size: 0.7rem; color: var(--text-muted); margin-top: -2px;">*Hold locked to 24h AI predictive frame.</span>
+                    </div>
+
+                    <!-- Margin / Yield calculations -->
+                    <div class="calc-results">
+                        <div class="calc-res-item">
+                            <span class="calc-res-title">Projected End Balance</span>
+                            <span class="calc-res-val" id="calc-end-balance">$1,029.47</span>
+                        </div>
+                        <div class="calc-res-item">
+                            <span class="calc-res-title">Return (Profit/Loss)</span>
+                            <span class="calc-res-val profit" id="calc-return">+$29.47 (+2.95%)</span>
+                        </div>
+                    </div>
+
+                    <button class="order-btn-submit" id="order-submit-btn" onclick="executeTradeOrder()">Place Buy Order</button>
+                </div>
+
+                <!-- Drop Alert settings & Simulator -->
+                <div class="glass-card alert-card">
+                    <h3 style="font-size: 1.15rem; color: white;">Risk & Drop Alert Center</h3>
+                    <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: -8px;">Configure warning limits and notification delivery channels.</p>
+
+                    <div class="alert-toggles" style="display: flex; flex-direction: column; gap: 0.75rem;">
+                        <div class="switch-row">
+                            <div>
+                                <span class="switch-label">Audio Siren Chime</span>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="alert-audio-toggle" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        
+                        <!-- Email toggle and input -->
+                        <div style="border-top: 1px solid var(--border-card); padding-top: 8px; display: flex; flex-direction: column; gap: 4px;">
+                            <div class="switch-row">
+                                <span class="switch-label" style="font-size: 0.8rem;">Dispatch Email Alerts</span>
+                                <label class="switch">
+                                    <input type="checkbox" id="alert-email-toggle" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <input type="email" id="alert-email-address" placeholder="investor@stocksense.ai" value="investor@stocksense.ai" style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-card); padding: 5px 8px; border-radius: var(--radius-sm); color: white; font-size: 11px; outline: none; width: 100%;">
+                        </div>
+
+                        <!-- SMS toggle and input -->
+                        <div style="border-top: 1px solid var(--border-card); padding-top: 8px; display: flex; flex-direction: column; gap: 4px;">
+                            <div class="switch-row">
+                                <span class="switch-label" style="font-size: 0.8rem;">Dispatch SMS Alerts</span>
+                                <label class="switch">
+                                    <input type="checkbox" id="alert-sms-toggle" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <input type="tel" id="alert-phone-number" placeholder="+91 98765 43210" value="+91 98765 43210" style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-card); padding: 5px 8px; border-radius: var(--radius-sm); color: white; font-size: 11px; outline: none; width: 100%;">
+                        </div>
+
+                        <div class="input-group" style="margin-top: 0.5rem;">
+                            <div class="slider-label">
+                                <span>Sudden Drop Limit Threshold</span>
+                                <span class="slider-value" id="alert-threshold-label">2.0%</span>
+                            </div>
+                            <input type="range" id="alert-threshold" min="0.5" max="10.0" step="0.5" value="2.0">
+                        </div>
+                    </div>
+
+                    <!-- Simulation button -->
+                    <button class="alert-btn" id="simulate-drop-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline>
+                            <polyline points="17 18 23 18 23 12"></polyline>
+                        </svg>
+                        Simulate Drop Crash
+                    </button>
+                </div>
+            </aside>
+        </div>
+    </div> <!-- Closing #dashboard-view -->
+
+    <!-- Full-page Portfolio Ledger View inside app-container -->
+    <div id="portfolio-ledger-view" class="view-panel" style="display: none;">
+        <!-- Portfolio Page Header -->
+        <header style="border-bottom: 1px solid var(--border-card); margin-bottom: 2rem; padding-bottom: 1.5rem;">
+            <div class="brand-section">
+                <div class="brand-logo">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M22 12h-4l-3 9L9 3l-3 9H2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="brand-name">StockSense AI</h1>
+                </div>
+            </div>
+            
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <button class="back-btn" onclick="navigateToPage('dashboard')" style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-card); color: white; padding: 0.55rem 1.1rem; border-radius: var(--radius-md); font-size: 0.85rem; font-weight: 700; font-family: 'Outfit', sans-serif; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: var(--transition);">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                    Back to Dashboard
+                </button>
+            </div>
+        </header>
+
+        <div style="max-width: 1400px; margin: 0 auto; padding: 0 1rem 3rem;">
+            <div style="margin-bottom: 2rem;">
+                <h1 style="font-family: 'Outfit', sans-serif; font-size: 2rem; font-weight: 850; color: white; margin: 0; background: linear-gradient(135deg, white, var(--text-secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                    Portfolio Holdings & Bids Manager
+                </h1>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.25rem;">Real-time management of active open bids, total liquidated assets, and historical realized gains.</p>
+            </div>
+
+            <!-- Ledger Metrics Banner -->
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-bottom: 2.5rem;">
+                <!-- Total Capital Invested -->
+                <div class="glass-card" style="padding: 1.5rem; display: flex; flex-direction: column; gap: 0.35rem; border-color: rgba(34,211,238,0.2);">
+                    <span style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Total Invested Money</span>
+                    <strong id="ledger-total-invested" style="font-size: 1.8rem; color: #22d3ee; text-shadow: 0 0 15px rgba(34,211,238,0.25); font-family: 'Outfit', sans-serif;">$0.00</strong>
+                    <span style="font-size: 0.65rem; color: var(--text-muted);">Cumulative capital active in market</span>
+                </div>
+                <!-- Total Capital Withdrawn -->
+                <div class="glass-card" style="padding: 1.5rem; display: flex; flex-direction: column; gap: 0.35rem; border-color: rgba(245,158,11,0.2);">
+                    <span style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Total Withdrawn Capital</span>
+                    <strong id="ledger-total-withdrawn" style="font-size: 1.8rem; color: #fbbf24; text-shadow: 0 0 15px rgba(251,191,36,0.25); font-family: 'Outfit', sans-serif;">$0.00</strong>
+                    <span style="font-size: 0.65rem; color: var(--text-muted);">Liquidated funds returned to balance</span>
+                </div>
+                <!-- Present Valuation -->
+                <div class="glass-card" style="padding: 1.5rem; display: flex; flex-direction: column; gap: 0.35rem; border-color: rgba(52,211,153,0.2);">
+                    <span style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Present Invested Valuation</span>
+                    <strong id="ledger-present-value" style="font-size: 1.8rem; color: #34d399; text-shadow: 0 0 15px rgba(52,211,153,0.25); font-family: 'Outfit', sans-serif;">$0.00</strong>
+                    <span style="font-size: 0.65rem; color: var(--text-muted);">Current value of open holdings</span>
+                </div>
+                <!-- Realized Profits/Losses -->
+                <div class="glass-card" style="padding: 1.5rem; display: flex; flex-direction: column; gap: 0.35rem; border-color: rgba(99,102,241,0.2);" id="ledger-pnl-card">
+                    <span style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Withdrawn Profit / Loss</span>
+                    <strong id="ledger-realized-pnl" style="font-size: 1.8rem; color: white; font-family: 'Outfit', sans-serif;">$0.00</strong>
+                    <span style="font-size: 0.65rem; color: var(--text-muted);">Realized PnL returned to ledger</span>
+                </div>
+            </div>
+
+            <!-- Active Open Bids Table -->
+            <div class="glass-card" style="margin-bottom: 2rem; padding: 1.5rem;">
+                <h2 style="font-size: 1.25rem; color: white; margin-bottom: 1.2rem; font-family: 'Outfit', sans-serif; display: flex; align-items: center; gap: 0.5rem; border-bottom: 1px solid var(--border-card); padding-bottom: 0.6rem;">
+                    <span style="display:inline-block; width: 4px; height: 16px; background: var(--primary); border-radius: 2px;"></span>
+                    Present Open Bids & Active Positions
+                </h2>
+                <div style="overflow-x: auto;">
+                    <table class="recommendations-table" style="width: 100%; border-collapse: collapse; text-align: left;">
+                        <thead>
+                            <tr style="border-bottom: 1px solid var(--border-card); color: var(--text-secondary); font-size: 0.8rem;">
+                                <th style="padding: 0.75rem 1rem;">Asset Symbol</th>
+                                <th style="padding: 0.75rem 1rem;">Order Type</th>
+                                <th style="padding: 0.75rem 1rem;">Capital Invested</th>
+                                <th style="padding: 0.75rem 1rem;">Purchase Rate</th>
+                                <th style="padding: 0.75rem 1rem;">Day to Day Rate</th>
+                                <th style="padding: 0.75rem 1rem;">Present Value</th>
+                                <th style="padding: 0.75rem 1rem;">Day to Day Gain/Loss</th>
+                                <th style="padding: 0.75rem 1rem; text-align: right;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ledger-active-bids-body">
+                            <!-- Dynamically loaded -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Sell All Projection Summary Block -->
+                <div class="glass-card" style="margin-top: 1.5rem; padding: 1.2rem 1.5rem; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid var(--primary); background: rgba(95, 90, 246, 0.04);" id="ledger-sell-all-summary-card">
+                    <div>
+                        <span style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; font-weight: bold; letter-spacing: 0.05em;">Sell Projection Summary</span>
+                        <div style="font-size: 0.92rem; color: white; margin-top: 0.2rem;" id="ledger-sell-all-summary">
+                            If you sell all active positions now at day to day market rates, you will receive a total of <strong>$0.00</strong>, resulting in a net profit/loss of <strong style="color: var(--secondary);">$0.00 (0.00%)</strong>.
+                        </div>
+                    </div>
+                    <button class="action-btn" onclick="withdrawAllPositions()" id="ledger-sell-all-btn" style="background: rgba(16,185,129,0.15); border-color: rgba(16,185,129,0.3); color: var(--secondary); padding: 0.6rem 1.2rem; font-weight: bold; border-radius: var(--radius-sm); font-size: 0.85rem; font-family: 'Outfit', sans-serif;">
+                        Sell & Liquidate All Bids
+                    </button>
+                </div>
+            </div>
+
+            <!-- Closed Bids Ledger Table -->
+            <div class="glass-card" style="padding: 1.5rem;">
+                <h2 style="font-size: 1.25rem; color: white; margin-bottom: 1.2rem; font-family: 'Outfit', sans-serif; display: flex; align-items: center; gap: 0.5rem; border-bottom: 1px solid var(--border-card); padding-bottom: 0.6rem;">
+                    <span style="display:inline-block; width: 4px; height: 16px; background: var(--secondary); border-radius: 2px;"></span>
+                    Closed Bids & Realized Ledger
+                </h2>
+                <div style="overflow-x: auto;">
+                    <table class="recommendations-table" style="width: 100%; border-collapse: collapse; text-align: left;">
+                        <thead>
+                            <tr style="border-bottom: 1px solid var(--border-card); color: var(--text-secondary); font-size: 0.8rem;">
+                                <th style="padding: 0.75rem 1rem;">Asset Symbol</th>
+                                <th style="padding: 0.75rem 1rem;">Order Type</th>
+                                <th style="padding: 0.75rem 1rem;">Entry Price</th>
+                                <th style="padding: 0.75rem 1rem;">Exit Price</th>
+                                <th style="padding: 0.75rem 1rem;">Invested Capital</th>
+                                <th style="padding: 0.75rem 1rem;">Withdrawn Capital</th>
+                                <th style="padding: 0.75rem 1rem;">Realized Profit / Loss</th>
+                                <th style="padding: 0.75rem 1rem; text-align: right;">Timestamp</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ledger-closed-bids-body">
+                            <!-- Dynamically loaded -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div> <!-- Closing .app-container -->
+
+    <!-- Alert Modal / Popup Overlay -->
+    <div class="alert-overlay" id="alert-overlay">
+        <div class="alert-modal" style="display: flex; flex-direction: column; gap: 0.75rem;">
+            <div class="alert-modal-glow"></div>
+            <div class="modal-icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                    <line x1="12" y1="9" x2="12" y2="13"></line>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+            </div>
+            <h4 class="modal-title">CRITICAL DROP ALERT</h4>
+            <div class="modal-subtitle" id="modal-alert-ticker">TSLA DROP</div>
+            <p class="modal-desc" id="modal-alert-details">Tesla shares collapsed by 5.42% in a single minute threshold tick. Immediate investor action is advised.</p>
+            
+            <!-- Quick trade action options inside modal alert -->
+            <div style="display: flex; gap: 0.75rem; width: 100%; z-index: 1;">
+                <button class="order-btn-submit" id="modal-buy-dip-btn" style="flex: 1; padding: 0.65rem 0;">BUY THE DIP</button>
+                <button class="order-btn-submit sell-mode" id="modal-short-sell-btn" style="flex: 1; padding: 0.65rem 0;">SHORT SELL</button>
+            </div>
+            <button class="modal-close-btn" id="modal-close-btn">Dismiss Alert</button>
+        </div>
+    </div>
+
+    <!-- Slide-out Vertical Drawer Panel (Portfolio & AI Analytics) -->
+    <div class="analytics-drawer-overlay" id="drawer-overlay" onclick="closeAnalyticsDrawer()"></div>
+    <div class="analytics-drawer" id="analytics-drawer">
+        <div class="drawer-header-row">
+            <div style="display: flex; align-items: center; gap: 0.6rem;">
+                <div class="glow-pulse-dot"></div>
+                <h2 class="drawer-main-title">AI PORTFOLIO ANALYTICS</h2>
+            </div>
+            <button class="drawer-close-btn-x" onclick="closeAnalyticsDrawer()">&times;</button>
+        </div>
+
+        <!-- Section 1: Portfolio Balance Sheet -->
+        <div class="drawer-card-section">
+            <div class="drawer-section-header">
+                <span class="header-icon-badge">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                </span>
+                <span class="drawer-section-title">PORTFOLIO BALANCE SHEET</span>
+            </div>
+            
+            <div class="drawer-stats-grid">
+                <!-- Active Invested Capital -->
+                <div class="drawer-stat-item cyan-glow">
+                    <span class="stat-lbl">Active Capital</span>
+                    <strong class="stat-val" id="stat-active-invested">$0.00</strong>
+                    <span class="stat-sub">Current open positions</span>
+                </div>
+                <!-- Present Invested Money -->
+                <div class="drawer-stat-item emerald-glow">
+                    <span class="stat-lbl">Present Invested Money</span>
+                    <strong class="stat-val" id="stat-present-value">$0.00</strong>
+                    <span class="stat-sub">Live valuation of holdings</span>
+                </div>
+                <!-- Present Profit / Loss -->
+                <div class="drawer-stat-item dynamic-glow" id="stat-present-pnl-card">
+                    <span class="stat-lbl">Present Profit / Loss</span>
+                    <strong class="stat-val" id="stat-present-pnl">$0.00 (0.00%)</strong>
+                    <span class="stat-sub">Floating returns</span>
+                </div>
+                <!-- Total Withdrawn Capital -->
+                <div class="drawer-stat-item gold-glow">
+                    <span class="stat-lbl">Total Withdrawn</span>
+                    <strong class="stat-val" id="stat-total-withdrawn">$0.00</strong>
+                    <span class="stat-sub">Liquidated cash returns</span>
+                </div>
+                <!-- Profit/Loss on Withdrawn -->
+                <div class="drawer-stat-item dynamic-glow" id="stat-withdrawn-pnl-card" style="grid-column: span 2;">
+                    <span class="stat-lbl">Withdrawn Profit / Loss</span>
+                    <strong class="stat-val" id="stat-withdrawn-pnl">$0.00</strong>
+                    <span class="stat-sub">Realized gains/losses ledger</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: AI Forecast Predictions -->
+        <div class="drawer-card-section" style="flex: 1; display: flex; flex-direction: column;">
+            <div class="drawer-section-header">
+                <span class="header-icon-badge">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                </span>
+                <span class="drawer-section-title">AI FORECAST PREDICTIONS</span>
+            </div>
+            
+            <div class="drawer-ai-content" style="display: flex; flex-direction: column; gap: 1rem; flex: 1;">
+                <div style="display: flex; gap: 1.5rem; align-items: center;">
+                    <!-- Circular Gauge with custom gradient stroke -->
+                    <div class="premium-gauge-wrapper">
+                        <svg class="premium-gauge-svg" viewBox="0 0 100 100">
+                            <defs>
+                                <linearGradient id="gauge-grad" x1="0%" y1="100%" x2="100%" y2="0%">
+                                    <stop offset="0%" stop-color="#8b5cf6" />
+                                    <stop offset="50%" stop-color="#6366f1" />
+                                    <stop offset="100%" stop-color="#10b981" />
+                                </linearGradient>
+                            </defs>
+                            <circle class="premium-gauge-bg" cx="50" cy="50" r="42"></circle>
+                            <circle class="premium-gauge-path" id="probability-gauge" cx="50" cy="50" r="42"></circle>
+                        </svg>
+                        <div class="premium-gauge-center">
+                            <span class="premium-gauge-val" id="probability-value">--%</span>
+                            <span class="premium-gauge-lbl" id="probability-label">Increase</span>
+                        </div>
+                    </div>
+
+                    <div style="flex: 1; display: flex; flex-direction: column; gap: 0.6rem;">
+                        <div class="stat-pill-row green">
+                            <span style="color: var(--text-secondary); display: flex; align-items: center; gap: 4px;">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="18 15 12 9 6 15"/></svg>
+                                Chance Up
+                            </span>
+                            <strong id="chance-increase">--%</strong>
+                        </div>
+                        <div class="stat-pill-row red">
+                            <span style="color: var(--text-secondary); display: flex; align-items: center; gap: 4px;">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6 9 12 15 18 9"/></svg>
+                                Chance Down
+                            </span>
+                            <strong id="chance-decrease">--%</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="drawer-ai-insight-box" id="ai-insight-text">
+                    Generating real-time model synthesis...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast stack notification drawer -->
+    <div class="toast-container" id="toast-drawer"></div>
+
+    <script src="app.js?v=1.0.3"></script>
+</body>
+</html>
